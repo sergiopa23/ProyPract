@@ -8,7 +8,10 @@ package modelo;
  *
  * @author parra
  */
-public class Administrador {
+
+/*Identificador único del administrador*/
+
+public class Administrador { 
     private int idAdmin;
     private int idUsuario;
 
@@ -18,7 +21,7 @@ public class Administrador {
         this.idAdmin = idAdmin;
         this.idUsuario = idUsuario;
     }
-
+/*Permiten acceder y modificar los valores de los atributos de la clase.*/
     public int getIdAdmin() { return idAdmin; }
     public void setIdAdmin(int idAdmin) { this.idAdmin = idAdmin; }
 
