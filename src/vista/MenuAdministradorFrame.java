@@ -2,6 +2,8 @@ package vista;
 
 import javax.swing.*;
 import java.awt.*;
+import modelo.SesionUsuario;
+
 
 public class MenuAdministradorFrame extends JFrame {
 
@@ -70,8 +72,7 @@ public class MenuAdministradorFrame extends JFrame {
         });
 
         btnActividades.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Aquí abrirá la Gestión de Actividades");
-            // new ActividadesCRUDFrame().setVisible(true);
+            new GestionActividadesAdminFrame().setVisible(true);
         });
 
         btnCerrarSesion.addActionListener(e -> {
@@ -83,6 +84,7 @@ public class MenuAdministradorFrame extends JFrame {
             );
 
             if (confirmacion == JOptionPane.YES_OPTION) {
+                SesionUsuario.limpiarSesion();
                 new LoginFramePro().setVisible(true);
                 dispose();
             }

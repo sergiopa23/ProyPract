@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
 import modelo.ConexionBD;
+import modelo.SesionUsuario;
 
 public class LoginFramePro extends JFrame {
 
@@ -87,62 +88,98 @@ public class LoginFramePro extends JFrame {
     }
 
     private void autenticar() {
-        String correo = txtCorreo.getText().trim();
-        String contrasena = new String(txtContrasena.getPassword()).trim();
 
-        String sql = "SELECT * FROM Usuarios "
-                   + "WHERE correoUsuario = ? "
-                   + "AND contrasenaUsuario = ?";
+    String correo = txtCorreo.getText().trim();
+    String contrasena = new String(txtContrasena.getPassword()).trim();
 
-        try (
+    String sql =
+            "SELECT u.idUsuario, u.nombreUsuario, u.esAdministrador, r.nombreRol " +
+            "FROM Usuarios u " +
+            "LEFT JOIN PracticaUsuario pu ON u.idUsuario = pu.idUsuario " +
+            "LEFT JOIN RolUsuario r ON pu.idRol = r.idRol " +
+            "WHERE u.correoUsuario = ? " +
+            "AND u.contrasenaUsuario = ?";
+
+    try (
             Connection conn = ConexionBD.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)
-        ) {
-            stmt.setString(1, correo);
-            stmt.setString(2, contrasena);
+    ) {
+        stmt.setString(1, correo);
+        stmt.setString(2, contrasena);
 
-            ResultSet rs = stmt.executeQuery();
+        ResultSet rs = stmt.executeQuery();
+        System.out.println(rs);
+        if (rs.next()) {
 
-            if (rs.next()) {
-                String nombre = rs.getString("nombreUsuario");
-                int esAdministrador = rs.getInt("esAdministrador");
-                System.out.println("Administrador: " + esAdministrador);
+            int idUsuario = rs.getInt("idUsuario");
+            String nombre = rs.getString("nombreUsuario");
+            int esAdministrador = rs.getInt("esAdministrador");
+            String rol = rs.getString("nombreRol");
 
+            // GUARDAR SESIÓN
+            SesionUsuario.idUsuario = idUsuario;
+            System.out.println(idUsuario);
+            SesionUsuario.nombreUsuario = nombre;
+            System.out.println(nombre);
+            SesionUsuario.rolUsuario = rol;
+            System.out.println(rol);
 
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Bienvenido " + nombre
+            );
+
+            // ADMIN
+            if (esAdministrador == 1) {
+                new MenuAdministradorFrame().setVisible(true);
+            }
+
+            // SUPERVISOR
+            else if ("Supervisor".equalsIgnoreCase(rol)) {
+                new GestionHorasSupervisorFrame().setVisible(true);
+            }
+
+            // DOCENTE
+            else if ("Docente".equalsIgnoreCase(rol)) {
                 JOptionPane.showMessageDialog(
                         this,
-                        "Bienvenido " + nombre
-                );
-
-                // Validar si es administrador
-                if (esAdministrador == 1) {
-                    new MenuAdministradorFrame().setVisible(true);
-                } else {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "Usuario válido, pero aún no tiene menú asignado."
-                            
-                    );
-                }
-
-                dispose(); // cerrar login
-
-            } else {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Credenciales incorrectas",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE
+                        "Menú docente pendiente de construir."
                 );
             }
 
-        } catch (SQLException ex) {
+            // ESTUDIANTE
+            else if ("Estudiante".equalsIgnoreCase(rol)) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Menú estudiante pendiente de construir."
+                );
+            }
+
+            else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "El usuario no tiene rol asignado."
+                );
+            }
+
+            dispose();
+
+        } else {
             JOptionPane.showMessageDialog(
                     this,
-                    "Error en la conexión: " + ex.getMessage()
+                    "Credenciales incorrectas",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
             );
         }
+
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Error en la conexión: " + ex.getMessage()
+        );
     }
+}
     
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
