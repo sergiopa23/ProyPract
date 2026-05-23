@@ -141,18 +141,14 @@ public class LoginFramePro extends JFrame {
 
             // DOCENTE
             else if ("Docente".equalsIgnoreCase(rol)) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Menú docente pendiente de construir."
-                );
+                    new MenuDocenteFrame().setVisible(true);
+
             }
 
             // ESTUDIANTE
             else if ("Estudiante".equalsIgnoreCase(rol)) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Menú estudiante pendiente de construir."
-                );
+                    new PortalEstudianteFrame().setVisible(true);
+
             }
 
             else {
