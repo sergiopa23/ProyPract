@@ -13,6 +13,7 @@ public class MenuAdministradorFrame extends JFrame {
     private JButton btnAsignaciones;
     private JButton btnActividades;
     private JButton btnCerrarSesion;
+    private JButton btnReportes;
     
 
     public MenuAdministradorFrame() {
@@ -43,6 +44,7 @@ public class MenuAdministradorFrame extends JFrame {
         btnAsignaciones = new JButton("Asignación de Usuarios");
         btnActividades = new JButton("Gestión de Actividades");
         btnCerrarSesion = new JButton("Cerrar Sesión");
+        btnReportes = new JButton("Reportes");
 
         panelBotones.add(btnUsuarios);
         panelBotones.add(btnInstituciones);
@@ -50,6 +52,7 @@ public class MenuAdministradorFrame extends JFrame {
         panelBotones.add(btnAsignaciones);
         panelBotones.add(btnActividades);
         panelBotones.add(btnCerrarSesion);
+        panelBotones.add(btnReportes);
 
         panelPrincipal.add(panelBotones, BorderLayout.CENTER);
 
@@ -73,6 +76,10 @@ public class MenuAdministradorFrame extends JFrame {
 
         btnActividades.addActionListener(e -> {
             new GestionActividadesAdminFrame().setVisible(true);
+        });
+        
+        btnReportes.addActionListener(e -> {
+    new ReportesFrame().setVisible(true);
         });
 
         btnCerrarSesion.addActionListener(e -> {
