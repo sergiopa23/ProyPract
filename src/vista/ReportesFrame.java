@@ -80,10 +80,5 @@ public class ReportesFrame extends JFrame {
                 );
             }
         });
-        
-        System.out.println(JasperCompileManager.class.getName());
-
-            JasperReport reporte =
-                 JasperCompileManager.compileReport(jrxml);  
-    }
+    } 
 }
