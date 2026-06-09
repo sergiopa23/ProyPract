@@ -8,6 +8,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
+import java.io.FileOutputStream;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 public class PortalEstudianteFrame extends JFrame {
 
     private JLabel lblBienvenida;
@@ -101,6 +110,7 @@ public class PortalEstudianteFrame extends JFrame {
         panelCentro.add(scrollTabla, BorderLayout.CENTER);
 
         add(panelCentro, BorderLayout.CENTER);
+        
 
         JPanel panelFormulario = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -189,6 +199,8 @@ public class PortalEstudianteFrame extends JFrame {
         btnGuardar = new JButton("Guardar Evidencia");
         btnLimpiar = new JButton("Limpiar");
         btnCerrarSesion = new JButton("Cerrar Sesión");
+        JButton btnReportes = new JButton("Reporte");
+        
 
         gbc.gridx = 0;
         gbc.gridy = fila;
@@ -196,6 +208,13 @@ public class PortalEstudianteFrame extends JFrame {
 
         gbc.gridx = 1;
         panelFormulario.add(btnLimpiar, gbc);
+        
+        fila++;
+
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        gbc.gridwidth = 2;
+        panelFormulario.add(btnReportes, gbc);
 
         fila++;
 
@@ -223,6 +242,8 @@ public class PortalEstudianteFrame extends JFrame {
             new LoginFramePro().setVisible(true);
             dispose();
         });
+        
+        btnReportes.addActionListener(e -> generarReportePDF());
     }
 
     private void cargarNombreUsuario() {
@@ -608,7 +629,107 @@ public class PortalEstudianteFrame extends JFrame {
 
         tablaActividades.clearSelection();
     }
+    
+    private void generarReportePDF() {
 
+        JFileChooser chooser = new JFileChooser();
+
+        if (chooser.showSaveDialog(this)
+                != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        String ruta =
+                chooser.getSelectedFile()
+                       .getAbsolutePath()
+                + ".pdf";
+
+        try {
+
+            Document documento =
+                    new Document(PageSize.A4);
+
+            PdfWriter.getInstance(
+                    documento,
+                    new FileOutputStream(ruta)
+            );
+
+            documento.open();
+
+            documento.add(
+                    new Paragraph(
+                            "REPORTE DEL ESTUDIANTE"
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(
+                            lblBienvenida.getText()
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(
+                            lblHoras.getText()
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(
+                            " "
+                    )
+            );
+
+            PdfPTable tabla =
+                    new PdfPTable(4);
+
+            tabla.setWidthPercentage(100);
+
+            tabla.addCell("Actividad");
+            tabla.addCell("Fecha Cierre");
+            tabla.addCell("Estado");
+            tabla.addCell("Nota");
+
+            for (int i = 0;
+                 i < modeloTabla.getRowCount();
+                 i++) {
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,1).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,3).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,4).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,5).toString()
+                );
+            }
+
+            documento.add(tabla);
+
+            documento.close();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Reporte generado correctamente."
+            );
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage()
+            );
+            System.out.println(ex.getMessage());
+        }
+    }
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
                 new PortalEstudianteFrame().setVisible(true)

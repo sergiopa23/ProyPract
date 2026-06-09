@@ -37,7 +37,7 @@ public class MenuDocenteFrame extends JFrame {
         JPanel panelBotones = new JPanel();
 
         panelBotones.setLayout(
-                new GridLayout(2, 2, 20, 20)
+            new GridLayout(3, 2, 20, 20)
         );
 
         panelBotones.setBorder(
@@ -48,11 +48,13 @@ public class MenuDocenteFrame extends JFrame {
         btnCalificar = new JButton("Calificar Evidencias");
         btnUsuariosAsignados = new JButton("Usuarios Asignados");
         btnCerrarSesion = new JButton("Cerrar Sesión");
+        
 
         panelBotones.add(btnActividades);
         panelBotones.add(btnCalificar);
         panelBotones.add(btnUsuariosAsignados);
         panelBotones.add(btnCerrarSesion);
+        
 
         panelPrincipal.add(panelBotones, BorderLayout.CENTER);
 
@@ -67,6 +69,7 @@ public class MenuDocenteFrame extends JFrame {
         btnUsuariosAsignados.addActionListener(e -> {
             new UsuariosAsignadosDocenteFrame().setVisible(true);
         });
+        
 
         btnCerrarSesion.addActionListener(e -> {
 

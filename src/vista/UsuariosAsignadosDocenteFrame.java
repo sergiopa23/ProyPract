@@ -8,6 +8,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
+import java.io.FileOutputStream;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 public class UsuariosAsignadosDocenteFrame extends JFrame {
 
     private JComboBox<String> comboPracticas;
@@ -15,6 +24,8 @@ public class UsuariosAsignadosDocenteFrame extends JFrame {
 
     private JTable tablaUsuarios;
     private DefaultTableModel modeloTabla;
+    
+    private JButton btnReportePDF;
 
     public UsuariosAsignadosDocenteFrame() {
 
@@ -57,6 +68,9 @@ public class UsuariosAsignadosDocenteFrame extends JFrame {
         JButton btnBuscar = new JButton("Buscar");
         panelFiltros.add(btnBuscar);
 
+        btnReportePDF = new JButton("Generar PDF");
+        panelFiltros.add(btnReportePDF);    
+
         add(panelFiltros, BorderLayout.NORTH);
 
         modeloTabla = new DefaultTableModel();
@@ -74,6 +88,7 @@ public class UsuariosAsignadosDocenteFrame extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
 
         btnBuscar.addActionListener(e -> cargarUsuarios());
+        btnReportePDF.addActionListener(e -> generarReportePDF());
 
         comboPracticas.addActionListener(e -> cargarUsuarios());
     }
@@ -194,6 +209,121 @@ public class UsuariosAsignadosDocenteFrame extends JFrame {
             );
         }
     }
+    
+    private void generarReportePDF() {
+
+        JFileChooser chooser = new JFileChooser();
+
+        if (chooser.showSaveDialog(this)
+                != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        String ruta =
+                chooser.getSelectedFile()
+                        .getAbsolutePath()
+                + ".pdf";
+
+        try {
+
+            Document documento =
+                    new Document(PageSize.A4.rotate());
+
+            PdfWriter.getInstance(
+                    documento,
+                    new FileOutputStream(ruta)
+            );
+
+            documento.open();
+
+            documento.add(
+                    new Paragraph(
+                            "REPORTE DE USUARIOS ASIGNADOS"
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(
+                            "Docente: "
+                            + SesionUsuario.nombreUsuario
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(
+                            "Práctica: "
+                            + comboPracticas.getSelectedItem()
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(" ")
+            );
+
+            PdfPTable tabla =
+                    new PdfPTable(6);
+
+            tabla.setWidthPercentage(100);
+
+            tabla.addCell("Documento");
+            tabla.addCell("Nombre");
+            tabla.addCell("Apellido");
+            tabla.addCell("Rol");
+            tabla.addCell("Práctica");
+            tabla.addCell("Cantidad Horas");
+
+            for (int i = 0;
+                 i < modeloTabla.getRowCount();
+                 i++) {
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,0).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,1).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,2).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,3).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,4).toString()
+                );
+
+                Object horas =
+                        modeloTabla.getValueAt(i,5);
+
+                tabla.addCell(
+                        horas == null
+                                ? ""
+                                : horas.toString()
+                );
+            }
+
+            documento.add(tabla);
+
+            documento.close();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Reporte generado correctamente."
+            );
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error: " + ex.getMessage()
+            );
+        }
+    }
+    
         public static void main(String[] args) {
         SwingUtilities.invokeLater(() ->
                 new UsuariosAsignadosDocenteFrame().setVisible(true)

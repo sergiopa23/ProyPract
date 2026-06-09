@@ -8,6 +8,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
+import java.io.FileOutputStream;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 public class GestionActividadesDocenteFrame extends JFrame {
 
     private JComboBox<String> comboPracticas;
@@ -22,6 +31,7 @@ public class GestionActividadesDocenteFrame extends JFrame {
     private JButton btnGuardar;
     private JButton btnOcultarMostrar;
     private JButton btnLimpiar;
+    private JButton btnReportePDF;
 
     private Integer idActividadSeleccionada = null;
     private Integer idPracticaSeleccionada = null;
@@ -129,6 +139,7 @@ public class GestionActividadesDocenteFrame extends JFrame {
         btnGuardar = new JButton("Guardar / Actualizar");
         btnOcultarMostrar = new JButton("Ocultar / Mostrar");
         btnLimpiar = new JButton("Limpiar");
+        btnReportePDF = new JButton("Generar PDF");
 
         gbc.gridx = 0;
         gbc.gridy = fila;
@@ -143,6 +154,13 @@ public class GestionActividadesDocenteFrame extends JFrame {
         gbc.gridy = fila;
         gbc.gridwidth = 2;
         panelFormulario.add(btnLimpiar, gbc);
+        
+        fila++;
+
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        gbc.gridwidth = 2;
+        panelFormulario.add(btnReportePDF, gbc);
 
         add(panelFormulario, BorderLayout.EAST);
                 comboPracticas.addActionListener(e -> cargarActividades());
@@ -158,6 +176,7 @@ public class GestionActividadesDocenteFrame extends JFrame {
         btnOcultarMostrar.addActionListener(e -> cambiarVisibilidad());
 
         btnLimpiar.addActionListener(e -> limpiarFormulario());
+        btnReportePDF.addActionListener(e -> generarReportePDF());
     }
 
     private void cargarPracticasDocente() {
@@ -478,6 +497,115 @@ public class GestionActividadesDocenteFrame extends JFrame {
         txtFechaCierre.setText("");
 
         tablaActividades.clearSelection();
+    }
+    
+    private void generarReportePDF() {
+
+        JFileChooser chooser = new JFileChooser();
+
+        if (chooser.showSaveDialog(this)
+                != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        String ruta =
+                chooser.getSelectedFile()
+                        .getAbsolutePath()
+                + ".pdf";
+
+        try {
+
+            Document documento =
+                    new Document(PageSize.A4.rotate());
+
+            PdfWriter.getInstance(
+                    documento,
+                    new FileOutputStream(ruta)
+            );
+
+            documento.open();
+
+            documento.add(
+                    new Paragraph(
+                            "REPORTE DE ACTIVIDADES"
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(
+                            "Docente: "
+                            + SesionUsuario.nombreUsuario
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(
+                            "Práctica: "
+                            + comboPracticas.getSelectedItem()
+                    )
+            );
+
+            documento.add(
+                    new Paragraph(" ")
+            );
+
+            PdfPTable tabla =
+                    new PdfPTable(6);
+
+            tabla.setWidthPercentage(100);
+
+            tabla.addCell("Práctica");
+            tabla.addCell("Título");
+            tabla.addCell("Descripción");
+            tabla.addCell("Fecha Creación");
+            tabla.addCell("Fecha Cierre");
+            tabla.addCell("Estado");
+
+            for (int i = 0;
+                 i < modeloTabla.getRowCount();
+                 i++) {
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,1).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,2).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,3).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,4).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,5).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,6).toString()
+                );
+            }
+
+            documento.add(tabla);
+
+            documento.close();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Reporte generado correctamente."
+            );
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error: " + ex.getMessage()
+            );
+        }
     }
 
     public static void main(String[] args) {

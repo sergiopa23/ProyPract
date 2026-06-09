@@ -8,6 +8,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.*;
 
+import java.io.FileOutputStream;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 public class GestionHorasSupervisorFrame extends JFrame {
 
     private JComboBox<String> comboPracticas;
@@ -26,6 +35,7 @@ public class GestionHorasSupervisorFrame extends JFrame {
     private JButton btnGuardar;
     private JButton btnLimpiar;
     private JButton btnCerrarSesion;
+    private JButton btnReportePDF;
 
     private Integer idUsuarioSeleccionado = null;
     private Integer idPracticaSeleccionada = null;
@@ -161,13 +171,21 @@ public class GestionHorasSupervisorFrame extends JFrame {
         btnGuardar = new JButton("Guardar / Actualizar Horas");
         btnLimpiar = new JButton("Limpiar");
         btnCerrarSesion = new JButton("Cerrar Sesión");
-
+        btnReportePDF = new JButton("Generar PDF");
+        
         gbc.gridx = 0;
         gbc.gridy = fila;
         panelFormulario.add(btnGuardar, gbc);
 
         gbc.gridx = 1;
         panelFormulario.add(btnLimpiar, gbc);
+        
+        fila++;
+
+        gbc.gridx = 0;
+        gbc.gridy = fila;
+        gbc.gridwidth = 2;
+        panelFormulario.add(btnReportePDF, gbc);
 
         fila++;
 
@@ -190,7 +208,7 @@ public class GestionHorasSupervisorFrame extends JFrame {
         btnGuardar.addActionListener(e -> guardarHoras());
 
         btnLimpiar.addActionListener(e -> limpiarFormulario());
-
+        btnReportePDF.addActionListener(e -> generarPDF());
         btnCerrarSesion.addActionListener(e -> {
             SesionUsuario.limpiarSesion();
             new LoginFramePro().setVisible(true);
@@ -433,6 +451,90 @@ public class GestionHorasSupervisorFrame extends JFrame {
         spinnerHoras.setValue(0);
 
         tablaEstudiantes.clearSelection();
+    }
+    
+    private void generarPDF() {
+
+        JFileChooser chooser = new JFileChooser();
+
+        if (chooser.showSaveDialog(this)
+                != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        String ruta =
+                chooser.getSelectedFile().getAbsolutePath()
+                + ".pdf";
+
+        try {
+
+            Document documento =
+                    new Document(PageSize.A4);
+
+            PdfWriter.getInstance(
+                    documento,
+                    new FileOutputStream(ruta)
+            );
+
+            documento.open();
+
+            documento.add(
+                    new Paragraph(
+                            "REPORTE DE HORAS DE ESTUDIANTES"
+                    )
+            );
+
+            documento.add(new Paragraph(" "));
+
+            PdfPTable tabla = new PdfPTable(5);
+
+            tabla.addCell("Documento");
+            tabla.addCell("Nombre");
+            tabla.addCell("Apellido");
+            tabla.addCell("Práctica");
+            tabla.addCell("Horas");
+
+            for (int i = 0;
+                 i < modeloTabla.getRowCount();
+                 i++) {
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,0).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,1).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,2).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,3).toString()
+                );
+
+                tabla.addCell(
+                        modeloTabla.getValueAt(i,4).toString()
+                );
+            }
+
+            documento.add(tabla);
+
+            documento.close();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "PDF generado correctamente."
+            );
+
+        } catch (Exception ex) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    ex.getMessage()
+            );
+        }
     }
 
     public static void main(String[] args) {
