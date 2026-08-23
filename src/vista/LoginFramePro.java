@@ -35,7 +35,7 @@ public class LoginFramePro extends JFrame {
         // Título superior
         JLabel lblTitulo = new JLabel("Bienvenido al Sistema", JLabel.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
-        lblTitulo.setForeground(Color.WHITE);
+        lblTitulo.setForeground(Color.BLACK);
         panelFondo.add(lblTitulo, BorderLayout.NORTH);
 
         // Panel formulario
@@ -47,7 +47,7 @@ public class LoginFramePro extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel lblCorreo = new JLabel("Correo:");
-        lblCorreo.setForeground(Color.WHITE);
+        lblCorreo.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 0;
         panelForm.add(lblCorreo, gbc);
@@ -57,7 +57,7 @@ public class LoginFramePro extends JFrame {
         panelForm.add(txtCorreo, gbc);
 
         JLabel lblContrasena = new JLabel("Contraseña:");
-        lblContrasena.setForeground(Color.WHITE);
+        lblContrasena.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 1;
         panelForm.add(lblContrasena, gbc);
